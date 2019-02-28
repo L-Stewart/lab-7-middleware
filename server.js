@@ -7,20 +7,26 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 const errorMiddleware = (error, request, response , next) => {
+
   console.log('Im an error and something is wrong');
   response.status(500);
   response.send('ERROR');
-  next();
-};
-
-const my404 = (request, response, next) => {
-  console.log('404 Page Not Not');
-  response.status(404);
-  response.send('The page you are looking for does not exist.')
   response.end();
 };
 
+const my404 = (request, response, next) => {
+  if(request.path !== '/a' || '/b' || '/c' || 'd'){
+
+    console.log('404 Page Not Found');
+    response.status(404);
+    response.send('The page you are looking for does not exist.')
+    response.end();
+
+  }
+};
+
 const timeMethodPathMiddleware = (request,response, next) => {
+
   const date = Date();
   request.requestTime = date.toString();
 
@@ -28,14 +34,17 @@ const timeMethodPathMiddleware = (request,response, next) => {
   console.log(request.path);
   console.log(request.requestTime);
   next();
+
 };
 
 const cNumber = (request, response, next) => {
+
   if(request.path === '/c'){
     console.log(Math.random());
     next();
   }
   next();
+
 };
 
 const bSquare = (numberToBeSquared) => {
@@ -50,6 +59,7 @@ const bSquare = (numberToBeSquared) => {
         next();
       }
       next();
+
     };
 };
 
@@ -61,9 +71,8 @@ app.get('/a',middles, (request, response, next) => {
 });
 
 app.get('/b',middles, (request, response, next) => {
-  response.status(200).send('Route B' + response.body.number);
-  // console.log(response);
-  // response.send(response.body.number);
+  const num = request.number;
+  response.status(200).send('Route B' + ' The Square is: ' + num);
   next();
 });
 
@@ -77,8 +86,7 @@ app.get('/d',middles, (request, response, next) => {
   next();
 });
 
-
 app.use(errorMiddleware);
-// app.use(my404);
+app.use(my404);
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
